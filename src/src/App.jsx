@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 const API_URL = "https://brokerpass-server-production.up.railway.app";
-
 const FREE_UNITS = ["FNSFMK515"];
-
 const UNITS = [
   { code: "FNSFMK515", name: "Financial Services Regulation & Compliance", icon: "⚖️", free: true },
   { code: "FNSFMB411", name: "Prepare Loan Applications", icon: "📋", free: false },
@@ -13,7 +11,6 @@ const UNITS = [
   { code: "FNSFMB511", name: "Implement Credit Contracts & Settlement", icon: "📝", free: false },
   { code: "FNSINC411", name: "Professional Practices in Financial Services", icon: "🎯", free: false },
 ];
-
 const SAMPLE_QUESTIONS = {
   "FNSFMK515": [
     { q: "Under ASIC's RG273, a mortgage broker's Best Interests Duty requires prioritising which factor above others when recommending a loan?", options: ["The lender with the highest commission", "Cost and affordability considerations for the client", "The broker's preferred panel lender", "Loan features regardless of cost"], answer: 1, explanation: "RG273 explicitly states brokers must prioritise cost and affordability. Failing to investigate lowest-cost options may indicate non-compliance with the Best Interests Duty." },
@@ -29,342 +26,42 @@ const SAMPLE_QUESTIONS = {
     { q: "What is an offset account and how does it benefit a borrower?", options: ["A savings account with no relationship to the loan", "A transaction account linked to the loan — balance reduces interest charged daily", "A government grant account", "A fixed-term deposit"], answer: 1, explanation: "An offset account reduces the loan principal for daily interest calculation." },
   ],
 };
-
 const SCENARIO = {
   title: "The First Home Buyer Scenario",
   setup: "Sarah, 29, earns $95,000 p.a. as a nurse. She has $120,000 saved, no debt, and wants to buy a $600,000 apartment. She wants rate stability but variable rates are currently lower.",
   questions: [
-    { q: "What is Sarah's approximate LVR if she uses her full deposit minus ~$30K for costs?", options: ["75%", "85%", "90%", "95%"], answer: 1, explanation: "Usable deposit ~$90,000. LVR = $510,000 / $600,000 = 85%. At 85% Sarah will likely need LMI." },
+    { q: "What is Sarah's approximate LVR if she uses her full deposit minus ~$30K for costs?", options: ["75%", "85%", "90%", "95%"], answer: 1, explanation: "Usable deposit ~$90,000. LVR = $510,000 / $600,000 = 85%." },
     { q: "Sarah says she wants 'whatever rate is cheapest.' Your Best Interests Duty obligation is to:", options: ["Recommend the cheapest rate immediately", "Recommend CBA since she banks there", "Gather complete information about her needs before recommending", "Lock in a fixed rate"], answer: 2, explanation: "Best Interests Duty requires a full needs assessment before any recommendation." },
     { q: "Given Sarah's preference for stability, which structure best demonstrates a needs-focused recommendation?", options: ["100% variable with offset", "Split loan — part fixed, part variable", "Interest only variable", "10-year fixed rate"], answer: 1, explanation: "A split loan addresses both: fixed portion gives certainty; variable gives flexibility." },
   ]
 };
-
 function ProgressRing({ pct, size = 48, stroke = 4, color = "#4ade80" }) {
-  const r = (size - stroke) / 2;
-  const circ = 2 * Math.PI * r;
-  return (
-    <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#1f2f1f" strokeWidth={stroke} />
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={circ * (1 - pct / 100)} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.6s ease" }} />
-    </svg>
-  );
+  const r = (size - stroke) / 2, circ = 2 * Math.PI * r;
+  return <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}><circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#1f2f1f" strokeWidth={stroke} /><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={circ*(1-pct/100)} strokeLinecap="round" style={{transition:"stroke-dashoffset 0.6s ease"}} /></svg>;
 }
-
 function PaywallModal({ onClose, onCheckout, loading }) {
-  return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ background: "#0a180a", border: "1px solid rgba(74,222,128,0.3)", borderRadius: 12, padding: "40px 32px", maxWidth: 480, width: "100%", position: "relative" }}>
-        <button onClick={onClose} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "#4a6a4a", cursor: "pointer", fontSize: 20 }}>✕</button>
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div style={{ fontSize: 42, fontWeight: 800, color: "#4ade80", lineHeight: 1 }}>$59</div>
-          <div style={{ color: "#7a9a7a", fontSize: 14, marginTop: 4 }}>One-time · Lifetime access</div>
-        </div>
-        {["All 7 core units — full question banks", "Client scenario library", "Live AI tutor — unlimited questions", "Progress tracking across all units", "New questions added each month"].map(f => (
-          <div key={f} style={{ display: "flex", gap: 10, marginBottom: 12 }}>
-            <span style={{ color: "#4ade80" }}>✓</span>
-            <span style={{ color: "#c8f0c8", fontSize: 14 }}>{f}</span>
-          </div>
-        ))}
-        <button onClick={onCheckout} disabled={loading} style={{ width: "100%", padding: "16px", background: "#4ade80", color: "#050e05", border: "none", borderRadius: 6, fontFamily: "inherit", fontSize: 16, fontWeight: 800, cursor: loading ? "wait" : "pointer", marginTop: 16 }}>
-          {loading ? "Redirecting to Stripe…" : "Unlock Full Access →"}
-        </button>
-        <div style={{ textAlign: "center", marginTop: 14, color: "#3a5a3a", fontSize: 12 }}>Secure payment via Stripe · Australian GST included</div>
-      </div>
-    </div>
-  );
+  return <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}><div style={{background:"#0a180a",border:"1px solid rgba(74,222,128,0.3)",borderRadius:12,padding:"40px 32px",maxWidth:480,width:"100%",position:"relative"}}><button onClick={onClose} style={{position:"absolute",top:16,right:16,background:"none",border:"none",color:"#4a6a4a",cursor:"pointer",fontSize:20}}>✕</button><div style={{textAlign:"center",marginBottom:32}}><div style={{fontSize:42,fontWeight:800,color:"#4ade80",lineHeight:1}}>$59</div><div style={{color:"#7a9a7a",fontSize:14,marginTop:4}}>One-time · Lifetime access</div></div>{["All 7 core units — full question banks","Client scenario library","Live AI tutor — unlimited questions","Progress tracking","New questions monthly"].map(f=><div key={f} style={{display:"flex",gap:10,marginBottom:12}}><span style={{color:"#4ade80"}}>✓</span><span style={{color:"#c8f0c8",fontSize:14}}>{f}</span></div>)}<button onClick={onCheckout} disabled={loading} style={{width:"100%",padding:"16px",background:"#4ade80",color:"#050e05",border:"none",borderRadius:6,fontFamily:"inherit",fontSize:16,fontWeight:800,cursor:loading?"wait":"pointer",marginTop:16}}>{loading?"Redirecting to Stripe…":"Unlock Full Access →"}</button><div style={{textAlign:"center",marginTop:14,color:"#3a5a3a",fontSize:12}}>Secure payment via Stripe · Australian GST included</div></div></div>;
 }
-
 export default function BrokerPass() {
-  const [screen, setScreen] = useState("home");
-  const [hasPaid, setHasPaid] = useState(false);
-  const [showPaywall, setShowPaywall] = useState(false);
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [selectedUnit, setSelectedUnit] = useState(null);
-  const [quizState, setQuizState] = useState({});
-  const [scenarioState, setScenarioState] = useState({ qIdx: 0, score: 0, showExp: false });
-  const [unitScores, setUnitScores] = useState({});
-  const [chatMessages, setChatMessages] = useState([{ role: "ai", text: "Hi! I'm your BrokerPass study companion. Ask me anything about the Cert IV." }]);
-  const [chatInput, setChatInput] = useState("");
-  const [chatLoading, setChatLoading] = useState(false);
-  const chatEndRef = useRef(null);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get("session_id");
-    if (sessionId) { verifyPayment(sessionId); window.history.replaceState({}, "", "/"); }
-    if (localStorage.getItem("bp_paid") === "true") setHasPaid(true);
-  }, []);
-
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatMessages]);
-
-  const verifyPayment = async (sessionId) => {
-    try {
-      const res = await fetch(`${API_URL}/verify-session?session_id=${sessionId}`);
-      const data = await res.json();
-      if (data.paid) { setHasPaid(true); localStorage.setItem("bp_paid", "true"); setScreen("units"); }
-    } catch (e) { console.error(e); }
-  };
-
-  const handleCheckout = async () => {
-    setCheckoutLoading(true);
-    try {
-      const res = await fetch(`${API_URL}/create-checkout-session`, { method: "POST" });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } catch (e) { alert("Payment error — please try again."); }
-    setCheckoutLoading(false);
-  };
-
-  const requiresPaid = (unit) => !unit.free && !hasPaid;
-
-  const startQuiz = (unit) => {
-    if (requiresPaid(unit)) { setShowPaywall(true); return; }
-    const qs = SAMPLE_QUESTIONS[unit.code] || [];
-    setSelectedUnit(unit);
-    setQuizState({ qIdx: 0, score: 0, showExp: false, selectedOpt: null, questions: qs });
-    setScreen("quiz");
-  };
-
-  const handleQuizAnswer = (optIdx) => {
-    if (quizState.showExp) return;
-    const correct = optIdx === quizState.questions[quizState.qIdx].answer;
-    setQuizState(s => ({ ...s, showExp: true, selectedOpt: optIdx, score: correct ? s.score + 1 : s.score }));
-  };
-
-  const nextQuizQ = () => {
-    const next = quizState.qIdx + 1;
-    if (next >= quizState.questions.length) {
-      const pct = Math.round((quizState.score / quizState.questions.length) * 100);
-      setUnitScores(s => ({ ...s, [selectedUnit.code]: pct }));
-      setScreen("units");
-    } else {
-      setQuizState(s => ({ ...s, qIdx: next, showExp: false, selectedOpt: null }));
-    }
-  };
-
-  const handleScenarioAnswer = (optIdx) => {
-    if (scenarioState.showExp) return;
-    const correct = optIdx === SCENARIO.questions[scenarioState.qIdx].answer;
-    setScenarioState(s => ({ ...s, showExp: true, selectedOpt: optIdx, score: correct ? s.score + 1 : s.score }));
-  };
-
-  const nextScenarioQ = () => {
-    const next = scenarioState.qIdx + 1;
-    if (next >= SCENARIO.questions.length) { setScreen("scenarioResults"); return; }
-    setScenarioState(s => ({ ...s, qIdx: next, showExp: false, selectedOpt: null }));
-  };
-
-  const sendChat = async () => {
-    if (!chatInput.trim() || chatLoading) return;
-    const msg = chatInput.trim();
-    setChatInput("");
-    setChatMessages(m => [...m, { role: "user", text: msg }]);
-    setChatLoading(true);
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, system: "You are BrokerPass, an expert AI study companion for the FNS40821 Certificate IV in Finance and Mortgage Broking (Australia). Help students understand ASIC compliance, loan products, client needs analysis, and professional practices. Be concise and exam-focused.", messages: [{ role: "user", content: msg }] })
-      });
-      const data = await res.json();
-      const reply = data.content?.find(b => b.type === "text")?.text || "Sorry, couldn't generate a response.";
-      setChatMessages(m => [...m, { role: "ai", text: reply }]);
-    } catch { setChatMessages(m => [...m, { role: "ai", text: "Connection error — please try again." }]); }
-    setChatLoading(false);
-  };
-
-  const S = {
-    app: { minHeight: "100vh", background: "#050e05", color: "#e8f4e8", fontFamily: "'DM Mono', 'Courier New', monospace", position: "relative" },
-    wrap: { maxWidth: 720, margin: "0 auto", padding: "0 20px", position: "relative", zIndex: 1 },
-    nav: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 0", borderBottom: "1px solid rgba(74,222,128,0.1)", marginBottom: 32 },
-    logo: { fontSize: 18, fontWeight: 700, color: "#4ade80", cursor: "pointer" },
-    tag: { display: "inline-block", background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.3)", color: "#4ade80", padding: "2px 10px", borderRadius: 2, fontSize: 11, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 },
-    h1: { fontSize: "clamp(26px,5vw,44px)", fontWeight: 700, lineHeight: 1.1, margin: "8px 0 16px" },
-    sub: { color: "#7a9a7a", fontSize: 15, lineHeight: 1.6, marginBottom: 28 },
-    btn: { display: "inline-flex", alignItems: "center", gap: 8, background: "#4ade80", color: "#050e05", border: "none", padding: "12px 24px", borderRadius: 4, fontFamily: "inherit", fontSize: 14, fontWeight: 700, cursor: "pointer" },
-    btnGhost: { display: "inline-flex", alignItems: "center", gap: 8, background: "transparent", color: "#4ade80", border: "1px solid rgba(74,222,128,0.4)", padding: "11px 24px", borderRadius: 4, fontFamily: "inherit", fontSize: 14, fontWeight: 600, cursor: "pointer" },
-    panel: { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(74,222,128,0.12)", borderRadius: 8, padding: 24 },
-    card: { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(74,222,128,0.12)", borderRadius: 8, padding: "16px 20px", marginBottom: 10, cursor: "pointer" },
-    optBtn: (sel, revealed, isAns) => ({ width: "100%", textAlign: "left", padding: "13px 16px", marginBottom: 8, borderRadius: 6, cursor: revealed ? "default" : "pointer", fontFamily: "inherit", fontSize: 14, lineHeight: 1.5, border: "1px solid", background: !revealed ? (sel ? "rgba(74,222,128,0.1)" : "rgba(255,255,255,0.02)") : isAns ? "rgba(74,222,128,0.15)" : sel ? "rgba(239,68,68,0.15)" : "rgba(255,255,255,0.02)", borderColor: !revealed ? (sel ? "#4ade80" : "rgba(74,222,128,0.15)") : isAns ? "#4ade80" : sel ? "#ef4444" : "rgba(74,222,128,0.1)", color: !revealed ? "#e8f4e8" : isAns ? "#4ade80" : sel ? "#f87171" : "#7a9a7a" }),
-    bubble: (r) => ({ maxWidth: "84%", padding: "12px 16px", borderRadius: 8, marginBottom: 10, fontSize: 13, lineHeight: 1.6, alignSelf: r === "user" ? "flex-end" : "flex-start", background: r === "user" ? "rgba(74,222,128,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${r === "user" ? "rgba(74,222,128,0.3)" : "rgba(74,222,128,0.1)"}`, color: r === "user" ? "#c8f0c8" : "#e8f4e8", whiteSpace: "pre-wrap" }),
-  };
-
-  const overallPct = Object.keys(unitScores).length > 0 ? Math.round(Object.values(unitScores).reduce((a, b) => a + b, 0) / Object.keys(unitScores).length) : 0;
-
-  if (screen === "home") return (
-    <div style={S.app}>
-      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} onCheckout={handleCheckout} loading={checkoutLoading} />}
-      <div style={S.wrap}>
-        <nav style={S.nav}>
-          <span style={S.logo}>BrokerPass</span>
-          <div style={{ display: "flex", gap: 10 }}>
-            {hasPaid ? <span style={{ color: "#4ade80", fontSize: 12 }}>✓ Full Access</span> : <button style={{ ...S.btnGhost, padding: "8px 16px", fontSize: 13 }} onClick={() => setShowPaywall(true)}>Unlock $59 →</button>}
-          </div>
-        </nav>
-        <div style={S.tag}>FNS40821 AI Study Companion</div>
-        <h1 style={S.h1}>Pass your Cert IV.<br /><span style={{ color: "#4ade80" }}>First attempt.</span></h1>
-        <p style={S.sub}>The only AI-powered study tool built for the FNS40821 Certificate IV in Finance & Mortgage Broking.</p>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 40 }}>
-          <button style={S.btn} onClick={() => setScreen("units")}>Start Studying →</button>
-          <button style={S.btnGhost} onClick={() => setScreen("scenario")}>Free Scenario</button>
-          {!hasPaid && <button style={S.btnGhost} onClick={() => setShowPaywall(true)}>Unlock All — $59</button>}
-        </div>
-        <div style={{ ...S.panel, marginBottom: 32 }}>
-          <div style={{ color: "#4ade80", fontWeight: 700, marginBottom: 16, fontSize: 12, letterSpacing: 2, textTransform: "uppercase" }}>Ask the AI Tutor — Free</div>
-          <div style={{ display: "flex", flexDirection: "column", minHeight: 180, maxHeight: 280, overflowY: "auto", marginBottom: 12 }}>
-            {chatMessages.map((m, i) => <div key={i} style={S.bubble(m.role)}>{m.text}</div>)}
-            {chatLoading && <div style={S.bubble("ai")}>Thinking…</div>}
-            <div ref={chatEndRef} />
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === "Enter" && sendChat()} placeholder="e.g. What is the Best Interests Duty?" style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 4, padding: "10px 14px", color: "#e8f4e8", fontFamily: "inherit", fontSize: 13, outline: "none" }} />
-            <button style={S.btn} onClick={sendChat} disabled={chatLoading}>Ask</button>
-          </div>
-        </div>
-        <div style={{ textAlign: "center", color: "#3a5a3a", fontSize: 11, paddingBottom: 32 }}>BrokerPass is a study aid only. Not an RTO. Not affiliated with ASIC, MFAA or FBAA.</div>
-      </div>
-    </div>
-  );
-
-  if (screen === "units") return (
-    <div style={S.app}>
-      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} onCheckout={handleCheckout} loading={checkoutLoading} />}
-      <div style={S.wrap}>
-        <nav style={S.nav}>
-          <span style={S.logo} onClick={() => setScreen("home")}>← BrokerPass</span>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {overallPct > 0 && <><ProgressRing pct={overallPct} /><span style={{ color: "#4ade80", fontSize: 13 }}>{overallPct}%</span></>}
-            {!hasPaid && <button style={{ ...S.btnGhost, padding: "8px 14px", fontSize: 12 }} onClick={() => setShowPaywall(true)}>Unlock All 🔒</button>}
-          </div>
-        </nav>
-        <div style={S.tag}>Unit Practice</div>
-        <h2 style={{ fontSize: 26, marginBottom: 8, fontWeight: 700 }}>Choose a unit</h2>
-        <p style={{ ...S.sub, marginBottom: 24 }}>{hasPaid ? "All 7 units unlocked." : "1 unit free. Unlock all 7 for $59."}</p>
-        {UNITS.map(u => {
-          const score = unitScores[u.code];
-          const locked = requiresPaid(u);
-          return (
-            <div key={u.code} style={{ ...S.card, opacity: locked ? 0.6 : 1 }} onClick={() => startQuiz(u)}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <span style={{ fontSize: 20 }}>{u.icon}</span>
-                  <div>
-                    <div style={{ fontSize: 10, color: "#4ade80", letterSpacing: 1, marginBottom: 2 }}>{u.code}</div>
-                    <div style={{ fontSize: 14, fontWeight: 600 }}>{u.name}</div>
-                  </div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {score !== undefined && <span style={{ color: score >= 80 ? "#4ade80" : "#fbbf24", fontSize: 13, fontWeight: 700 }}>{score}%</span>}
-                  {locked ? <span>🔒</span> : <span style={{ color: "#4ade80" }}>→</span>}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        <div style={{ marginTop: 20 }}>
-          <button style={S.btnGhost} onClick={() => setScreen("scenario")}>Try Scenario Mode →</button>
-        </div>
-      </div>
-    </div>
-  );
-
-  if (screen === "quiz" && quizState.questions?.length) {
-    const q = quizState.questions[quizState.qIdx];
-    return (
-      <div style={S.app}>
-        <div style={S.wrap}>
-          <nav style={S.nav}>
-            <span style={S.logo} onClick={() => setScreen("units")}>← Units</span>
-            <span style={{ color: "#7a9a7a", fontSize: 13 }}>{quizState.qIdx + 1} / {quizState.questions.length}</span>
-          </nav>
-          <div style={S.tag}>{selectedUnit?.code}</div>
-          <div style={{ height: 3, background: "rgba(74,222,128,0.1)", borderRadius: 2, marginBottom: 28, overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${(quizState.qIdx / quizState.questions.length) * 100}%`, background: "#4ade80", transition: "width 0.4s" }} />
-          </div>
-          <div style={S.panel}>
-            <div style={{ fontSize: 15, lineHeight: 1.65, marginBottom: 22, fontWeight: 500 }}>{q.q}</div>
-            {q.options.map((opt, i) => (
-              <button key={i} style={S.optBtn(quizState.selectedOpt === i, quizState.showExp, i === q.answer)} onClick={() => handleQuizAnswer(i)}>
-                <span style={{ marginRight: 10, opacity: 0.4 }}>{String.fromCharCode(65 + i)}.</span>{opt}
-              </button>
-            ))}
-            {quizState.showExp && (
-              <div style={{ marginTop: 20, padding: 16, background: "rgba(74,222,128,0.05)", borderRadius: 6, border: "1px solid rgba(74,222,128,0.2)" }}>
-                <div style={{ color: quizState.selectedOpt === q.answer ? "#4ade80" : "#f87171", fontSize: 12, letterSpacing: 1, marginBottom: 8, textTransform: "uppercase" }}>{quizState.selectedOpt === q.answer ? "✓ Correct" : "✗ Incorrect"}</div>
-                <div style={{ color: "#c8f0c8", fontSize: 13, lineHeight: 1.6 }}>{q.explanation}</div>
-                <button style={{ ...S.btn, marginTop: 16 }} onClick={nextQuizQ}>{quizState.qIdx + 1 < quizState.questions.length ? "Next →" : "Finish Unit →"}</button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (screen === "scenario") {
-    const q = SCENARIO.questions[scenarioState.qIdx];
-    return (
-      <div style={S.app}>
-        <div style={S.wrap}>
-          <nav style={S.nav}>
-            <span style={S.logo} onClick={() => setScreen("home")}>← BrokerPass</span>
-            <span style={{ color: "#4ade80", fontSize: 11, letterSpacing: 2 }}>FREE SCENARIO</span>
-          </nav>
-          <div style={S.tag}>Assessment Practice</div>
-          <h2 style={{ fontSize: 20, marginBottom: 16, fontWeight: 700 }}>{SCENARIO.title}</h2>
-          <div style={{ ...S.panel, marginBottom: 20 }}>
-            <div style={{ fontSize: 11, color: "#4ade80", letterSpacing: 2, marginBottom: 10, textTransform: "uppercase" }}>Client Brief</div>
-            <p style={{ fontSize: 13, lineHeight: 1.7, color: "#c8f0c8", margin: 0 }}>{SCENARIO.setup}</p>
-          </div>
-          <div style={{ fontSize: 12, color: "#7a9a7a", marginBottom: 14 }}>Question {scenarioState.qIdx + 1} of {SCENARIO.questions.length}</div>
-          <div style={S.panel}>
-            <div style={{ fontSize: 15, lineHeight: 1.65, marginBottom: 22, fontWeight: 500 }}>{q.q}</div>
-            {q.options.map((opt, i) => (
-              <button key={i} style={S.optBtn(scenarioState.selectedOpt === i, scenarioState.showExp, i === q.answer)} onClick={() => handleScenarioAnswer(i)}>
-                <span style={{ marginRight: 10, opacity: 0.4 }}>{String.fromCharCode(65 + i)}.</span>{opt}
-              </button>
-            ))}
-            {scenarioState.showExp && (
-              <div style={{ marginTop: 20, padding: 16, background: "rgba(74,222,128,0.05)", borderRadius: 6, border: "1px solid rgba(74,222,128,0.2)" }}>
-                <div style={{ color: scenarioState.selectedOpt === q.answer ? "#4ade80" : "#f87171", fontSize: 12, letterSpacing: 1, marginBottom: 8, textTransform: "uppercase" }}>{scenarioState.selectedOpt === q.answer ? "✓ Correct" : "✗ Incorrect"}</div>
-                <div style={{ color: "#c8f0c8", fontSize: 13, lineHeight: 1.6 }}>{q.explanation}</div>
-                <button style={{ ...S.btn, marginTop: 16 }} onClick={nextScenarioQ}>{scenarioState.qIdx + 1 < SCENARIO.questions.length ? "Next →" : "See Results →"}</button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (screen === "scenarioResults") {
-    const pct = Math.round((scenarioState.score / SCENARIO.questions.length) * 100);
-    return (
-      <div style={S.app}>
-        {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} onCheckout={handleCheckout} loading={checkoutLoading} />}
-        <div style={S.wrap}>
-          <nav style={S.nav}><span style={S.logo} onClick={() => setScreen("home")}>BrokerPass</span></nav>
-          <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
-            <ProgressRing pct={pct} size={90} stroke={6} color={pct >= 70 ? "#4ade80" : "#fbbf24"} />
-            <div style={{ fontSize: 40, fontWeight: 800, marginTop: 12, color: pct >= 70 ? "#4ade80" : "#fbbf24" }}>{pct}%</div>
-            <div style={{ color: "#7a9a7a", marginTop: 8, marginBottom: 32, fontSize: 14 }}>{pct >= 80 ? "Solid. You understand the needs analysis framework." : "Review the compliance explanations and retry."}</div>
-            {!hasPaid && (
-              <div style={{ ...S.panel, marginBottom: 28, textAlign: "left" }}>
-                <div style={{ color: "#4ade80", fontWeight: 700, marginBottom: 8 }}>Want to practice all 7 units?</div>
-                <div style={{ color: "#7a9a7a", fontSize: 13, marginBottom: 16 }}>Full access includes complete question banks for all 7 core units and unlimited AI tutor access.</div>
-                <button style={S.btn} onClick={() => setShowPaywall(true)}>Unlock Full Access — $59 →</button>
-              </div>
-            )}
-            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <button style={S.btnGhost} onClick={() => { setScenarioState({ qIdx: 0, score: 0, showExp: false }); setScreen("scenario"); }}>Retry</button>
-              <button style={S.btnGhost} onClick={() => setScreen("units")}>Practice Units</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  const [screen,setScreen]=useState("home"),[hasPaid,setHasPaid]=useState(false),[showPaywall,setShowPaywall]=useState(false),[checkoutLoading,setCheckoutLoading]=useState(false),[selectedUnit,setSelectedUnit]=useState(null),[quizState,setQuizState]=useState({}),[scenarioState,setScenarioState]=useState({qIdx:0,score:0,showExp:false}),[unitScores,setUnitScores]=useState({}),[chatMessages,setChatMessages]=useState([{role:"ai",text:"Hi! I'm your BrokerPass study companion. Ask me anything about the Cert IV."}]),[chatInput,setChatInput]=useState(""),[chatLoading,setChatLoading]=useState(false);
+  const chatEndRef=useRef(null);
+  useEffect(()=>{const p=new URLSearchParams(window.location.search),s=p.get("session_id");if(s){verifyPayment(s);window.history.replaceState({},"","/");}if(localStorage.getItem("bp_paid")==="true")setHasPaid(true);},[]);
+  useEffect(()=>{chatEndRef.current?.scrollIntoView({behavior:"smooth"});},[chatMessages]);
+  const verifyPayment=async(sessionId)=>{try{const r=await fetch(`${API_URL}/verify-session?session_id=${sessionId}`),d=await r.json();if(d.paid){setHasPaid(true);localStorage.setItem("bp_paid","true");setScreen("units");}}catch(e){console.error(e);}};
+  const handleCheckout=async()=>{setCheckoutLoading(true);try{const r=await fetch(`${API_URL}/create-checkout-session`,{method:"POST"}),d=await r.json();if(d.url)window.location.href=d.url;}catch(e){alert("Payment error — please try again.");}setCheckoutLoading(false);};
+  const requiresPaid=(unit)=>!unit.free&&!hasPaid;
+  const startQuiz=(unit)=>{if(requiresPaid(unit)){setShowPaywall(true);return;}const qs=SAMPLE_QUESTIONS[unit.code]||[];setSelectedUnit(unit);setQuizState({qIdx:0,score:0,showExp:false,selectedOpt:null,questions:qs});setScreen("quiz");};
+  const handleQuizAnswer=(optIdx)=>{if(quizState.showExp)return;const correct=optIdx===quizState.questions[quizState.qIdx].answer;setQuizState(s=>({...s,showExp:true,selectedOpt:optIdx,score:correct?s.score+1:s.score}));};
+  const nextQuizQ=()=>{const next=quizState.qIdx+1;if(next>=quizState.questions.length){const pct=Math.round((quizState.score/quizState.questions.length)*100);setUnitScores(s=>({...s,[selectedUnit.code]:pct}));setScreen("units");}else{setQuizState(s=>({...s,qIdx:next,showExp:false,selectedOpt:null}));}};
+  const handleScenarioAnswer=(optIdx)=>{if(scenarioState.showExp)return;const correct=optIdx===SCENARIO.questions[scenarioState.qIdx].answer;setScenarioState(s=>({...s,showExp:true,selectedOpt:optIdx,score:correct?s.score+1:s.score}));};
+  const nextScenarioQ=()=>{const next=scenarioState.qIdx+1;if(next>=SCENARIO.questions.length){setScreen("scenarioResults");return;}setScenarioState(s=>({...s,qIdx:next,showExp:false,selectedOpt:null}));};
+  const sendChat=async()=>{if(!chatInput.trim()||chatLoading)return;const msg=chatInput.trim();setChatInput("");setChatMessages(m=>[...m,{role:"user",text:msg}]);setChatLoading(true);try{const res=await fetch(`${API_URL}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:msg})});const data=await res.json();const reply=data.reply||"Sorry, couldn't generate a response.";setChatMessages(m=>[...m,{role:"ai",text:reply}]);}catch{setChatMessages(m=>[...m,{role:"ai",text:"Connection error — please try again."}]);}setChatLoading(false);};
+  const S={app:{minHeight:"100vh",background:"#050e05",color:"#e8f4e8",fontFamily:"'DM Mono','Courier New',monospace"},wrap:{maxWidth:720,margin:"0 auto",padding:"0 20px",position:"relative",zIndex:1},nav:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"20px 0",borderBottom:"1px solid rgba(74,222,128,0.1)",marginBottom:32},logo:{fontSize:18,fontWeight:700,color:"#4ade80",cursor:"pointer"},tag:{display:"inline-block",background:"rgba(74,222,128,0.1)",border:"1px solid rgba(74,222,128,0.3)",color:"#4ade80",padding:"2px 10px",borderRadius:2,fontSize:11,letterSpacing:2,textTransform:"uppercase",marginBottom:12},h1:{fontSize:"clamp(26px,5vw,44px)",fontWeight:700,lineHeight:1.1,margin:"8px 0 16px"},sub:{color:"#7a9a7a",fontSize:15,lineHeight:1.6,marginBottom:28},btn:{display:"inline-flex",alignItems:"center",gap:8,background:"#4ade80",color:"#050e05",border:"none",padding:"12px 24px",borderRadius:4,fontFamily:"inherit",fontSize:14,fontWeight:700,cursor:"pointer"},btnGhost:{display:"inline-flex",alignItems:"center",gap:8,background:"transparent",color:"#4ade80",border:"1px solid rgba(74,222,128,0.4)",padding:"11px 24px",borderRadius:4,fontFamily:"inherit",fontSize:14,fontWeight:600,cursor:"pointer"},panel:{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(74,222,128,0.12)",borderRadius:8,padding:24},card:{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(74,222,128,0.12)",borderRadius:8,padding:"16px 20px",marginBottom:10,cursor:"pointer"},optBtn:(sel,revealed,isAns)=>({width:"100%",textAlign:"left",padding:"13px 16px",marginBottom:8,borderRadius:6,cursor:revealed?"default":"pointer",fontFamily:"inherit",fontSize:14,lineHeight:1.5,border:"1px solid",background:!revealed?(sel?"rgba(74,222,128,0.1)":"rgba(255,255,255,0.02)"):isAns?"rgba(74,222,128,0.15)":sel?"rgba(239,68,68,0.15)":"rgba(255,255,255,0.02)",borderColor:!revealed?(sel?"#4ade80":"rgba(74,222,128,0.15)"):isAns?"#4ade80":sel?"#ef4444":"rgba(74,222,128,0.1)",color:!revealed?"#e8f4e8":isAns?"#4ade80":sel?"#f87171":"#7a9a7a"}),bubble:(r)=>({maxWidth:"84%",padding:"12px 16px",borderRadius:8,marginBottom:10,fontSize:13,lineHeight:1.6,alignSelf:r==="user"?"flex-end":"flex-start",background:r==="user"?"rgba(74,222,128,0.1)":"rgba(255,255,255,0.04)",border:`1px solid ${r==="user"?"rgba(74,222,128,0.3)":"rgba(74,222,128,0.1)"}`,color:r==="user"?"#c8f0c8":"#e8f4e8",whiteSpace:"pre-wrap"})};
+  const overallPct=Object.keys(unitScores).length>0?Math.round(Object.values(unitScores).reduce((a,b)=>a+b,0)/Object.keys(unitScores).length):0;
+  if(screen==="home")return<div style={S.app}>{showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onCheckout={handleCheckout} loading={checkoutLoading}/>}<div style={S.wrap}><nav style={S.nav}><span style={S.logo}>BrokerPass</span><div style={{display:"flex",gap:10}}>{hasPaid?<span style={{color:"#4ade80",fontSize:12}}>✓ Full Access</span>:<button style={{...S.btnGhost,padding:"8px 16px",fontSize:13}} onClick={()=>setShowPaywall(true)}>Unlock $59 →</button>}</div></nav><div style={S.tag}>FNS40821 AI Study Companion</div><h1 style={S.h1}>Pass your Cert IV.<br/><span style={{color:"#4ade80"}}>First attempt.</span></h1><p style={S.sub}>The only AI-powered study tool built for the FNS40821 Certificate IV in Finance & Mortgage Broking.</p><div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:40}}><button style={S.btn} onClick={()=>setScreen("units")}>Start Studying →</button><button style={S.btnGhost} onClick={()=>setScreen("scenario")}>Free Scenario</button>{!hasPaid&&<button style={S.btnGhost} onClick={()=>setShowPaywall(true)}>Unlock All — $59</button>}</div><div style={{...S.panel,marginBottom:32}}><div style={{color:"#4ade80",fontWeight:700,marginBottom:16,fontSize:12,letterSpacing:2,textTransform:"uppercase"}}>Ask the AI Tutor — Free</div><div style={{display:"flex",flexDirection:"column",minHeight:180,maxHeight:280,overflowY:"auto",marginBottom:12}}>{chatMessages.map((m,i)=><div key={i} style={S.bubble(m.role)}>{m.text}</div>)}{chatLoading&&<div style={S.bubble("ai")}>Thinking…</div>}<div ref={chatEndRef}/></div><div style={{display:"flex",gap:8}}><input value={chatInput} onChange={e=>setChatInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&sendChat()} placeholder="e.g. What is the Best Interests Duty?" style={{flex:1,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(74,222,128,0.2)",borderRadius:4,padding:"10px 14px",color:"#e8f4e8",fontFamily:"inherit",fontSize:13,outline:"none"}}/><button style={S.btn} onClick={sendChat} disabled={chatLoading}>Ask</button></div></div><div style={{textAlign:"center",color:"#3a5a3a",fontSize:11,paddingBottom:32}}>BrokerPass is a study aid only. Not an RTO. Not affiliated with ASIC, MFAA or FBAA.</div></div></div>;
+  if(screen==="units")return<div style={S.app}>{showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onCheckout={handleCheckout} loading={checkoutLoading}/>}<div style={S.wrap}><nav style={S.nav}><span style={S.logo} onClick={()=>setScreen("home")}>← BrokerPass</span><div style={{display:"flex",alignItems:"center",gap:12}}>{overallPct>0&&<><ProgressRing pct={overallPct}/><span style={{color:"#4ade80",fontSize:13}}>{overallPct}%</span></>}{!hasPaid&&<button style={{...S.btnGhost,padding:"8px 14px",fontSize:12}} onClick={()=>setShowPaywall(true)}>Unlock All 🔒</button>}</div></nav><div style={S.tag}>Unit Practice</div><h2 style={{fontSize:26,marginBottom:8,fontWeight:700}}>Choose a unit</h2><p style={{...S.sub,marginBottom:24}}>{hasPaid?"All 7 units unlocked.":"1 unit free. Unlock all 7 for $59."}</p>{UNITS.map(u=>{const score=unitScores[u.code],locked=requiresPaid(u);return<div key={u.code} style={{...S.card,opacity:locked?0.6:1}} onClick={()=>startQuiz(u)}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><div style={{display:"flex",alignItems:"center",gap:12}}><span style={{fontSize:20}}>{u.icon}</span><div><div style={{fontSize:10,color:"#4ade80",letterSpacing:1,marginBottom:2}}>{u.code}</div><div style={{fontSize:14,fontWeight:600}}>{u.name}</div></div></div><div style={{display:"flex",alignItems:"center",gap:8}}>{score!==undefined&&<span style={{color:score>=80?"#4ade80":"#fbbf24",fontSize:13,fontWeight:700}}>{score}%</span>}{locked?<span>🔒</span>:<span style={{color:"#4ade80"}}>→</span>}</div></div></div>;})} <div style={{marginTop:20}}><button style={S.btnGhost} onClick={()=>setScreen("scenario")}>Try Scenario Mode →</button></div></div></div>;
+  if(screen==="quiz"&&quizState.questions?.length){const q=quizState.questions[quizState.qIdx];return<div style={S.app}><div style={S.wrap}><nav style={S.nav}><span style={S.logo} onClick={()=>setScreen("units")}>← Units</span><span style={{color:"#7a9a7a",fontSize:13}}>{quizState.qIdx+1} / {quizState.questions.length}</span></nav><div style={S.tag}>{selectedUnit?.code}</div><div style={{height:3,background:"rgba(74,222,128,0.1)",borderRadius:2,marginBottom:28,overflow:"hidden"}}><div style={{height:"100%",width:`${(quizState.qIdx/quizState.questions.length)*100}%`,background:"#4ade80",transition:"width 0.4s"}}/></div><div style={S.panel}><div style={{fontSize:15,lineHeight:1.65,marginBottom:22,fontWeight:500}}>{q.q}</div>{q.options.map((opt,i)=><button key={i} style={S.optBtn(quizState.selectedOpt===i,quizState.showExp,i===q.answer)} onClick={()=>handleQuizAnswer(i)}><span style={{marginRight:10,opacity:0.4}}>{String.fromCharCode(65+i)}.</span>{opt}</button>)}{quizState.showExp&&<div style={{marginTop:20,padding:16,background:"rgba(74,222,128,0.05)",borderRadius:6,border:"1px solid rgba(74,222,128,0.2)"}}><div style={{color:quizState.selectedOpt===q.answer?"#4ade80":"#f87171",fontSize:12,letterSpacing:1,marginBottom:8,textTransform:"uppercase"}}>{quizState.selectedOpt===q.answer?"✓ Correct":"✗ Incorrect"}</div><div style={{color:"#c8f0c8",fontSize:13,lineHeight:1.6}}>{q.explanation}</div><button style={{...S.btn,marginTop:16}} onClick={nextQuizQ}>{quizState.qIdx+1<quizState.questions.length?"Next →":"Finish Unit →"}</button></div>}</div></div></div>;}
+  if(screen==="scenario"){const q=SCENARIO.questions[scenarioState.qIdx];return<div style={S.app}><div style={S.wrap}><nav style={S.nav}><span style={S.logo} onClick={()=>setScreen("home")}>← BrokerPass</span><span style={{color:"#4ade80",fontSize:11,letterSpacing:2}}>FREE SCENARIO</span></nav><div style={S.tag}>Assessment Practice</div><h2 style={{fontSize:20,marginBottom:16,fontWeight:700}}>{SCENARIO.title}</h2><div style={{...S.panel,marginBottom:20}}><div style={{fontSize:11,color:"#4ade80",letterSpacing:2,marginBottom:10,textTransform:"uppercase"}}>Client Brief</div><p style={{fontSize:13,lineHeight:1.7,color:"#c8f0c8",margin:0}}>{SCENARIO.setup}</p></div><div style={{fontSize:12,color:"#7a9a7a",marginBottom:14}}>Question {scenarioState.qIdx+1} of {SCENARIO.questions.length}</div><div style={S.panel}><div style={{fontSize:15,lineHeight:1.65,marginBottom:22,fontWeight:500}}>{q.q}</div>{q.options.map((opt,i)=><button key={i} style={S.optBtn(scenarioState.selectedOpt===i,scenarioState.showExp,i===q.answer)} onClick={()=>handleScenarioAnswer(i)}><span style={{marginRight:10,opacity:0.4}}>{String.fromCharCode(65+i)}.</span>{opt}</button>)}{scenarioState.showExp&&<div style={{marginTop:20,padding:16,background:"rgba(74,222,128,0.05)",borderRadius:6,border:"1px solid rgba(74,222,128,0.2)"}}><div style={{color:scenarioState.selectedOpt===q.answer?"#4ade80":"#f87171",fontSize:12,letterSpacing:1,marginBottom:8,textTransform:"uppercase"}}>{scenarioState.selectedOpt===q.answer?"✓ Correct":"✗ Incorrect"}</div><div style={{color:"#c8f0c8",fontSize:13,lineHeight:1.6}}>{q.explanation}</div><button style={{...S.btn,marginTop:16}} onClick={nextScenarioQ}>{scenarioState.qIdx+1<SCENARIO.questions.length?"Next →":"See Results →"}</button></div>}</div></div></div>;}
+  if(screen==="scenarioResults"){const pct=Math.round((scenarioState.score/SCENARIO.questions.length)*100);return<div style={S.app}>{showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onCheckout={handleCheckout} loading={checkoutLoading}/>}<div style={S.wrap}><nav style={S.nav}><span style={S.logo} onClick={()=>setScreen("home")}>BrokerPass</span></nav><div style={{textAlign:"center",padding:"32px 0 24px"}}><ProgressRing pct={pct} size={90} stroke={6} color={pct>=70?"#4ade80":"#fbbf24"}/><div style={{fontSize:40,fontWeight:800,marginTop:12,color:pct>=70?"#4ade80":"#fbbf24"}}>{pct}%</div><div style={{color:"#7a9a7a",marginTop:8,marginBottom:32,fontSize:14}}>{pct>=80?"Solid. You understand the needs analysis framework.":"Review the compliance explanations and retry."}</div>{!hasPaid&&<div style={{...S.panel,marginBottom:28,textAlign:"left"}}><div style={{color:"#4ade80",fontWeight:700,marginBottom:8}}>Want to practice all 7 units?</div><div style={{color:"#7a9a7a",fontSize:13,marginBottom:16}}>Full access includes complete question banks and unlimited AI tutor.</div><button style={S.btn} onClick={()=>setShowPaywall(true)}>Unlock Full Access — $59 →</button></div>}<div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}><button style={S.btnGhost} onClick={()=>{setScenarioState({qIdx:0,score:0,showExp:false});setScreen("scenario");}}>Retry</button><button style={S.btnGhost} onClick={()=>setScreen("units")}>Practice Units</button></div></div></div></div>;}
   return null;
 }
