@@ -14,15 +14,13 @@ gaEl.src = 'https://www.googletagmanager.com/gtag/js?id=G-6CXYVZMWYF'
 document.head.appendChild(gaEl)
 
 // Microsoft Clarity
-window.clarity = window.clarity || function() {
-      (window.clarity.q = window.clarity.q || []).push(arguments)
-}
+window.clarity = window.clarity || function() {}
+window.clarity.q = window.clarity.q || []
 const clEl = document.createElement('script')
 clEl.async = true
 clEl.src = 'https://www.clarity.ms/tag/wg1sd0nuox'
-const firstScript = document.getElementsByTagName('script')[0]
-firstScript.parentNode.insertBefore(clEl, firstScript)
+document.head.appendChild(clEl)
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-      <React.StrictMode><App /></React.StrictMode>React.StrictMode>,
-    )</React.StrictMode>
+        <React.StrictMode><App /></React.StrictMode>
+      )
